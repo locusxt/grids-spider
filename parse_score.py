@@ -8,6 +8,9 @@ import re
 import time
 import random
 
+DOMAIN = "162.105.86.11:8080"
+# DOMAIN = "programming.grids.cn"
+
 def make_cookie(name, value):
     return http.cookiejar.Cookie(
         version=0,
@@ -15,7 +18,7 @@ def make_cookie(name, value):
         value=value,
         port=None,
         port_specified=False,
-        domain="programming.grids.cn",
+        domain=DOMAIN,
         domain_specified=True,
         domain_initial_dot=False,
         path="/",
@@ -28,24 +31,44 @@ def make_cookie(name, value):
         rest=None
     )
 
-user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36"
-head = {'User-Agent': user_agent, 'Accept-Encoding':'gzip, deflate, sdch', 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'}
+# user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36"
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+# head = {'User-Agent': user_agent, 'Accept-Encoding':'gzip, deflate, sdch', 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'}
+
 
 #修改以下三行
-mycookie = "34276ba71a3ca93846af35a650413de049d481ef80d381ed17e98e8114a2938bb355040f00c56f703ca30fe623d774da8caf1da95eda6dfec32512ad59c73960"
-myurl = "http://programming.grids.cn/programming/admin/course/82cb41a9976b474d8bd773bcf0ea770b/showProblemList.do?problemsId=2943fa72326a416f8003ada10040d85e"
+# mycookie = "34276ba71a3ca93846af35a650413de049d481ef80d381ed17e98e8114a2938bb355040f00c56f703ca30fe623d774da8caf1da95eda6dfec32512ad59c73960"
+mycookie = "passport=cbf8a5e71c8664792dc607674e93d164c5508e8d4e278695c0fe76d14aab74819bd6254829e869f349d6966415745a44; Path=/"
+# myurl = "http://programming.grids.cn/programming/admin/course/82cb41a9976b474d8bd773bcf0ea770b/showProblemList.do?problemsId=2943fa72326a416f8003ada10040d85e"
+# myurl = "http://162.105.86.11:8080/programming/admin/course/1ee5bbfdf0854b1ebbec3f307d1ec517/showProblemList.do?problemsId=e7f514bc44de43f29567f384247fe05a"
+myurl = "http://162.105.86.11:8080/programming/admin/course/1ee5bbfdf0854b1ebbec3f307d1ec517/showProblemList.do?problemsId=e21a522dd7dc475a88e36cd9fcd926b8"
 file_name = "6.txt"#写入的文件名
 
-cookie = http.cookiejar.CookieJar()
-#change this when needed
-cookie.set_cookie(make_cookie("passport", mycookie))
 
-domain = "http://programming.grids.cn"
+head = {
+	'User-Agent': user_agent, 
+	'Accept-Encoding':'gzip, deflate', 
+	'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+	'Accept-Language':'zh-CN,zh;q=0.9,en;q=0.8',
+	'Cache-Control':'max-age=0',
+	'Connection':'keep-alive',
+	'Host':DOMAIN,
+	'Upgrade-Insecure-Requests':1,
+	'Cookie':mycookie
+	}
+
+# cookie = http.cookiejar.CookieJar()
+#change this when needed
+# cookie.set_cookie(make_cookie("passport", mycookie))
+
+# domain = "http://programming.grids.cn"
+domain = "http://"+DOMAIN
 
 def open_html(url):
     time.sleep(random.uniform(0, 1)) #延迟0-1秒
     request = urllib.request.Request(url, headers=head)
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie))  
+    # opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie))  
+    opener = urllib.request.build_opener() 
     response = opener.open(request)
     # response = urllib.request.urlopen(request)
     html = response.read().decode("gb2312")
@@ -82,6 +105,7 @@ if __name__ == '__main__':
     url = myurl
     print(url)
     html = open_html(url)
+    print(html)
     soup = BeautifulSoup(html, "lxml")
     # st_list = soup.find_all("tr", class_="evenrow" )
     # st_list = st_list + soup.find_all("tr", class_="oddrow")
@@ -106,6 +130,7 @@ if __name__ == '__main__':
                 if c == "green":
                     new_url = tmp_list[i].find("a").attrs['href']
                     new_url = domain + new_url + "&start=0&step=100"
+                    print(new_url)
                     atime = parse_score_html(new_url)
                     res_list.append(atime)
                 else:
